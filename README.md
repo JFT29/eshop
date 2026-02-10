@@ -19,3 +19,24 @@ While this is a basic implementation, I applied a few fundamental secure coding 
 ### Potential Improvements
 Looking back at the source code, I believe there is one area that could be improved:
 * **Validation:** Currently, the application allows a user to save a product with an empty name or a negative quantity. To improve this, I should add validation logic (using `@Min` or `@NotBlank`) in the `Product` model to ensure data integrity before it reaches the repository. This would make the application more robust and prevent "garbage data" from being stored.
+
+## Reflection 2
+
+### 1. Unit Testing & Code Coverage
+After writing the unit tests, I feel much more confident in the stability of the application. Tests act as a "safety net" that allows me to refactor code without fear of breaking existing logic.
+
+* **How many tests?** There isn't a fixed number; instead, a class should have enough tests to cover all possible execution paths (logic branches, loops, and edge cases).
+* **Verification:** To ensure tests are sufficient, we look at **Code Coverage**. It measures which lines of code were executed during testing. However, **100% code coverage does not mean the code is bug-free.** Coverage only proves the code was *executed*, not that it was *correct* under every possible state or edge case (e.g., a logic error that still runs but produces the wrong result).
+
+### 2. Functional Testing Cleanliness
+If I were to create a new functional test suite for verifying the number of items in the product list by copying the setup from `CreateProductFunctionalTest.java`, several clean code issues would arise:
+
+* **Code Duplication (Violation of DRY):** Repeating the same setup procedures (like `@LocalServerPort`, `@Value`, and the `setupTest` method) creates "boilerplate" code. If the base URL or the port logic changes, I would have to update it in every single test file.
+* **Reduced Maintainability:** High duplication makes the test suite "brittle." More code means more places for bugs to hide and more effort required for future modifications.
+* **Readability:** The core intent of the test (verifying item counts) would be buried under lines of setup code that are identical across files.
+
+#### **Suggested Improvements:**
+To make the code cleaner, I would:
+1.  **Create a Base Class:** Define a `BaseFunctionalTest` class that contains the common setup logic, variables (URL, port), and `setupTest` method.
+2.  **Inheritance:** Have `CreateProductFunctionalTest` and the new `ProductListCountFunctionalTest` extend this base class.
+3.  **Utility Methods:** Move common actions (like logging in or navigating to the product list) into the base class or a helper "Page Object" class to keep the test methods focused purely on assertions.
