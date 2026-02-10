@@ -65,4 +65,58 @@ class ProductRepositoryTest {
         assertEquals(product2.getProductId(), savedProduct.getProductId());
         assertFalse(productIterator.hasNext());
     }
+
+    @Test
+    void testEditProductPositive() {
+        Product product = new Product();
+        product.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd7");
+        product.setProductName("Sampo Cap Bambang");
+        product.setProductQuantity(100);
+        productRepository.create(product);
+
+        // Update the product
+        product.setProductName("Sampo Cap Baru");
+        product.setProductQuantity(50);
+        productRepository.update(product);
+
+        Product updatedProduct = productRepository.findById("eb558e9f-1c39-460e-8860-71af6af63bd7");
+        assertEquals("Sampo Cap Baru", updatedProduct.getProductName());
+        assertEquals(50, updatedProduct.getProductQuantity());
+    }
+
+    @Test
+    void testEditProductNegative() {
+        // Attempting to update a product that was never created
+        Product product = new Product();
+        product.setProductId("non-existent-id");
+        product.setProductName("Ghost Product");
+
+        productRepository.update(product);
+
+        Product found = productRepository.findById("non-existent-id");
+        assertNull(found); // Or check that the list size is still 0
+    }
+
+    @Test
+    void testDeleteProductPositive() {
+        Product product = new Product();
+        product.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd7");
+        product.setProductName("Sampo Cap Bambang");
+        productRepository.create(product);
+
+        productRepository.delete("eb558e9f-1c39-460e-8860-71af6af63bd7");
+
+        Product deletedProduct = productRepository.findById("eb558e9f-1c39-460e-8860-71af6af63bd7");
+        assertNull(deletedProduct);
+    }
+
+    @Test
+    void testDeleteProductNegative() {
+        // Deleting a non-existent ID should not throw an exception or delete the wrong thing
+        productRepository.delete("random-id");
+
+        // If you have existing data, verify the size remains the same
+        Iterator<Product> productIterator = productRepository.findAll();
+        assertFalse(productIterator.hasNext());
+    }
 }
